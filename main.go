@@ -29,7 +29,7 @@ func main() {
 
 		switch args[0] {
 		case "register":
-			err := commands.Register(args[1:])
+			output, err := commands.Register(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -38,8 +38,9 @@ func main() {
 				}
 			}
 
+			fmt.Print(output)
 		case "create-folder":
-			err := commands.CreateFolder(args[1:])
+			output, err := commands.CreateFolder(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -47,8 +48,10 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 		case "list-folders":
-			err := commands.ListFolders(args[1:])
+			output, err := commands.ListFolders(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -56,8 +59,10 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 		case "delete-folder":
-			err := commands.DeleteFolder(args[1:])
+			output, err := commands.DeleteFolder(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -65,8 +70,10 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 		case "rename-folder":
-			err := commands.RenameFolder(args[1:])
+			output, err := commands.RenameFolder(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -74,9 +81,11 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 
 		case "create-file":
-			err := commands.CreateFile(args[1:])
+			output, err := commands.CreateFile(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -84,8 +93,10 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 		case "list-files":
-			err := commands.ListFiles(args[1:])
+			output, err := commands.ListFiles(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -93,8 +104,10 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 		case "delete-file":
-			err := commands.DeleteFile(args[1:])
+			output, err := commands.DeleteFile(args[1:])
 			if err != nil {
 				if strings.Contains(err.Error(), "Usage: ") {
 					fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -102,8 +115,11 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 				}
 			}
+
+			fmt.Print(output)
 		case "help":
-			commands.Help()
+			output := commands.Help()
+			fmt.Print(output)
 		case "exit":
 			commands.Exit()
 		default:

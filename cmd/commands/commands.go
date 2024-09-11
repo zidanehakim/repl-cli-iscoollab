@@ -8,25 +8,24 @@ import (
 	"strings"
 )
 
-func Register(args []string) error {
+func Register(args []string) (string, error) {
 	if len(args) != 1 {
-		return fmt.Errorf(user.CommandsUsage["register"])
+		return "", fmt.Errorf(user.CommandsUsage["register"])
 	}
 
 	username := strings.ToLower(args[0])
 	err := user.RegisterUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Add %s successfully\n", username)
-
-	return nil
+	output := fmt.Sprintf("Add %s successfully\n", username)
+	return output, nil
 }
 
-func CreateFolder(args []string) error {
+func CreateFolder(args []string) (string, error) {
 	if len(args) != 2 && len(args) != 3 {
-		return fmt.Errorf(user.CommandsUsage["create-folder"])
+		return "", fmt.Errorf(user.CommandsUsage["create-folder"])
 	}
 
 	username := strings.ToLower(args[0])
@@ -39,22 +38,21 @@ func CreateFolder(args []string) error {
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = user.CreateFolder(folderName, description)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Create %s successfully\n", folderName)
-
-	return nil
+	output := fmt.Sprintf("Create %s successfully\n", folderName)
+	return output, nil
 }
 
-func DeleteFolder(args []string) error {
+func DeleteFolder(args []string) (string, error) {
 	if len(args) != 2 {
-		return fmt.Errorf(user.CommandsUsage["delete-folder"])
+		return "", fmt.Errorf(user.CommandsUsage["delete-folder"])
 	}
 
 	username := strings.ToLower(args[0])
@@ -62,22 +60,21 @@ func DeleteFolder(args []string) error {
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = user.DeleteFolder(folderName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Delete %s successfully\n", folderName)
-
-	return nil
+	output := fmt.Sprintf("Delete %s successfully\n", folderName)
+	return output, nil
 }
 
-func ListFolders(args []string) error {
+func ListFolders(args []string) (string, error) {
 	if len(args) < 1 || len(args) > 3 {
-		return fmt.Errorf(user.CommandsUsage["list-folders"])
+		return "", fmt.Errorf(user.CommandsUsage["list-folders"])
 	}
 
 	username := strings.ToLower(args[0])
@@ -85,14 +82,14 @@ func ListFolders(args []string) error {
 	sortOrder := "asc"
 	if len(args) > 1 {
 		if args[1] != "--sort-name" && args[1] != "--sort-created" {
-			return fmt.Errorf(user.CommandsUsage["list-folders"])
+			return "", fmt.Errorf(user.CommandsUsage["list-folders"])
 		}
 
 		sortBy = args[1]
 	}
 	if len(args) > 2 {
 		if args[2] != "asc" && args[2] != "desc" {
-			return fmt.Errorf(user.CommandsUsage["list-folders"])
+			return "", fmt.Errorf(user.CommandsUsage["list-folders"])
 		}
 
 		sortOrder = args[2]
@@ -100,52 +97,52 @@ func ListFolders(args []string) error {
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	folders, err := user.ListFolders(sortBy, sortOrder)
 	if err != nil {
-		return err
+		return "", err
 	}
 
+	var output strings.Builder
 	for _, folder := range folders {
 		var description string
 		if folder.Description != "" {
 			description = " " + folder.Description
 		}
-		fmt.Printf("%s%s %s %s\n", folder.Name, description, folder.CreatedAt, user.Username)
+		output.WriteString(fmt.Sprintf("%s%s %s %s\n", folder.Name, description, folder.CreatedAt, user.Username))
 	}
 
-	return nil
+	return output.String(), nil
 }
 
-func RenameFolder(args []string) error {
+func RenameFolder(args []string) (string, error) {
 	if len(args) != 3 {
-		return fmt.Errorf(user.CommandsUsage["rename-folder"])
+		return "", fmt.Errorf(user.CommandsUsage["rename-folder"])
 	}
 
 	username := strings.ToLower(args[0])
 	folderName := strings.ToLower(args[1])
-	newFolderName := args[2]
+	newFolderName := strings.ToLower(args[2])
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = user.RenameFolder(folderName, newFolderName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Rename %s to %s successfully\n", folderName, newFolderName)
-
-	return nil
+	output := fmt.Sprintf("Rename %s to %s successfully\n", folderName, newFolderName)
+	return output, nil
 }
 
-func CreateFile(args []string) error {
+func CreateFile(args []string) (string, error) {
 	if len(args) != 3 && len(args) != 4 {
-		return fmt.Errorf(user.CommandsUsage["create-file"])
+		return "", fmt.Errorf(user.CommandsUsage["create-file"])
 	}
 
 	username := strings.ToLower(args[0])
@@ -158,27 +155,26 @@ func CreateFile(args []string) error {
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	folder, err := user.GetFolder(folderName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = folder.CreateFile(fileName, description)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Create %s in %s/%s successfully\n", fileName, username, folderName)
-
-	return nil
+	output := fmt.Sprintf("Create %s in %s/%s successfully\n", fileName, username, folderName)
+	return output, nil
 }
 
-func ListFiles(args []string) error {
+func ListFiles(args []string) (string, error) {
 	if len(args) < 2 || len(args) > 4 {
-		return fmt.Errorf(user.CommandsUsage["list-files"])
+		return "", fmt.Errorf(user.CommandsUsage["list-files"])
 	}
 
 	username := strings.ToLower(args[0])
@@ -187,14 +183,14 @@ func ListFiles(args []string) error {
 	sortOrder := "asc"
 	if len(args) > 2 {
 		if args[2] != "--sort-name" && args[2] != "--sort-created" {
-			return fmt.Errorf(user.CommandsUsage["list-files"])
+			return "", fmt.Errorf(user.CommandsUsage["list-files"])
 		}
 
 		sortBy = args[2]
 	}
 	if len(args) > 3 {
 		if args[3] != "asc" && args[3] != "desc" {
-			return fmt.Errorf(user.CommandsUsage["list-files"])
+			return "", fmt.Errorf(user.CommandsUsage["list-files"])
 		}
 
 		sortOrder = args[3]
@@ -202,33 +198,34 @@ func ListFiles(args []string) error {
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	folder, err := user.GetFolder(folderName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	files, err := folder.ListFiles(sortBy, sortOrder)
 	if err != nil {
-		return err
+		return "", err
 	}
 
+	var output strings.Builder
 	for _, file := range files {
 		var description string
 		if file.Description != "" {
 			description = " " + file.Description
 		}
-		fmt.Printf("%s%s %s %s\n", file.Name, description, file.CreatedAt, user.Username)
+		output.WriteString(fmt.Sprintf("%s%s %s %s\n", file.Name, description, file.CreatedAt, user.Username))
 	}
 
-	return nil
+	return output.String(), nil
 }
 
-func DeleteFile(args []string) error {
+func DeleteFile(args []string) (string, error) {
 	if len(args) != 3 {
-		return fmt.Errorf(user.CommandsUsage["delete-file"])
+		return "", fmt.Errorf(user.CommandsUsage["delete-file"])
 	}
 
 	username := strings.ToLower(args[0])
@@ -237,38 +234,40 @@ func DeleteFile(args []string) error {
 
 	user, err := user.GetUser(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	folder, err := user.GetFolder(folderName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = folder.DeleteFile(fileName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Deleted file %s from %s/%s successfully\n", fileName, username, folderName)
-
-	return nil
+	output := fmt.Sprintf("Deleted file %s from %s/%s successfully\n", fileName, username, folderName)
+	return output, nil
 }
 
-func Help() {
-	fmt.Println("Available commands:")
-	fmt.Println("  register [username]                                                         - Register a new user")
-	fmt.Println("  create-folder [username] [foldername] [description]?                        - Create a new folder")
-	fmt.Println("  list-folders [username] [--sort-name|--sort-created] [asc|desc]             - List folders for a user")
-	fmt.Println("  delete-folder [username] [foldername]                                       - Delete a folder")
-	fmt.Println("  rename-folder [username] [foldername] [new-folder-name]                     - Rename a folder")
-	fmt.Println("  create-file [username] [foldername] [filename] [description]?               - Create a new file")
-	fmt.Println("  list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]  - List files in a folder")
-	fmt.Println("  delete-file [username] [foldername] [filename]                              - Delete a file")
-	fmt.Println("  help                                                                        - Show this help message")
-	fmt.Println("  exit                                                                        - Exit the program")
-	fmt.Println("\nNote: Parameters in square brackets [] are required, those with ? are optional.")
-	fmt.Println("For sorting, you can use either --sort-name or --sort-created, followed by asc (ascending) or desc (descending).")
+func Help() string {
+	output := `Available commands:
+  register [username]                                                         - Register a new user
+  create-folder [username] [foldername] [description]?                        - Create a new folder
+  list-folders [username] [--sort-name|--sort-created] [asc|desc]             - List folders for a user
+  delete-folder [username] [foldername]                                       - Delete a folder
+  rename-folder [username] [foldername] [new-folder-name]                     - Rename a folder
+  create-file [username] [foldername] [filename] [description]?               - Create a new file
+  list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]  - List files in a folder
+  delete-file [username] [foldername] [filename]                              - Delete a file
+  help                                                                        - Show this help message
+  exit                                                                        - Exit the program
+
+Note: Parameters in square brackets [] are required, those with ? are optional.
+For sorting, you can use either --sort-name or --sort-created, followed by asc (ascending) or desc (descending).
+`
+	return output
 }
 
 func Exit() {
