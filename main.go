@@ -26,9 +26,6 @@ func main() {
 		command = strings.TrimSpace(command)
 		// Parse input, accept extra spaces and quotes
 		args := utils.ParseInput(command)
-		for i := range args {
-			fmt.Println(args[i])
-		}
 
 		switch args[0] {
 		case "register":
