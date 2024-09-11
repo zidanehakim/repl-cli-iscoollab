@@ -27,31 +27,44 @@ func main() {
 
 		switch args[0] {
 		case "register":
-			username := args[1]
-			err := commands.Register(username)
+			err := commands.Register(args[1:])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err)
 			}
+
 		case "create-folder":
-			username := args[1]
-			folderName := args[2]
-			description := args[3]
-			err := commands.CreateFolder(username, folderName, description)
+			err := commands.CreateFolder(args[1:])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err)
 			}
 		case "list-folders":
-			username := args[1]
-			sortBy := args[2]
-			sortOrder := args[3]
-			err := commands.ListFolders(username, sortBy, sortOrder)
+			err := commands.ListFolders(args[1:])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err)
 			}
 		case "delete-folder":
-			username := args[1]
-			folderName := args[2]
-			err := commands.DeleteFolder(username, folderName)
+			err := commands.DeleteFolder(args[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err)
+			}
+		case "rename-folder":
+			err := commands.RenameFolder(args[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err)
+			}
+
+		case "create-file":
+			err := commands.CreateFile(args[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err)
+			}
+		case "list-files":
+			err := commands.ListFiles(args[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err)
+			}
+		case "delete-file":
+			err := commands.DeleteFile(args[1:])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err)
 			}
