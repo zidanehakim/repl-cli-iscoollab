@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ListUser []*User
+	ListUser = make(map[string]*User)
 
 	CommandsUsage = map[string]string{
 		"list-files":    "Usage: list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]",
@@ -24,40 +24,45 @@ var (
 	}
 )
 
+const (
+	MaxUsernameLength   = 25
+	MaxFolderNameLength = 255
+	MaxFileNameLength   = 255
+)
+
 type User struct {
 	Username string
-	Folders  []*Folder
+	Folders  map[string]*Folder
 }
 
 func (u *User) CreateFolder(folderName string, description string) error {
 	if !utils.ValidateString(folderName) {
-		return fmt.Errorf("Error: %s contain invalid chars.", folderName)
+		return fmt.Errorf("%s contain invalid chars", folderName)
 	}
 
-	if u.checkFolder(folderName) {
-		return fmt.Errorf("Error: The %s has already existed.", folderName)
+	if _, exists := u.Folders[folderName]; exists {
+		return fmt.Errorf("the %s has already existed", folderName)
 	}
 
 	folder := &Folder{
 		Name:        folderName,
 		CreatedAt:   time.Now().Format("2006-01-02 15:04:05"),
 		Description: description,
+		Files:       make(map[string]*File),
 	}
 
-	u.Folders = append(u.Folders, folder)
+	u.Folders[folderName] = folder
 
 	return nil
 }
 
 func (u *User) DeleteFolder(folderName string) error {
-	for i, folder := range u.Folders {
-		if folder.Name == folderName {
-			u.Folders = append(u.Folders[:i], u.Folders[i+1:]...)
-			return nil
-		}
+	if _, exists := u.Folders[folderName]; exists {
+		delete(u.Folders, folderName)
+		return nil
 	}
 
-	return fmt.Errorf("Error: The %s doesn't exist.", folderName)
+	return fmt.Errorf("the %s doesn't exist", folderName)
 }
 
 func (u *User) ListFolders(sortBy string, sortOrder string) ([]*Folder, error) {
@@ -71,92 +76,81 @@ func (u *User) ListFolders(sortBy string, sortOrder string) ([]*Folder, error) {
 		return nil, fmt.Errorf(CommandsUsage["list-folders"])
 	}
 
+	folders := make([]*Folder, 0, len(u.Folders))
+	for _, folder := range u.Folders {
+		folders = append(folders, folder)
+	}
+
 	switch sortBy {
 	case "--sort-name":
-		sort.Slice(u.Folders, func(i, j int) bool {
+		sort.Slice(folders, func(i, j int) bool {
 			if isAsc {
-				return u.Folders[i].Name < u.Folders[j].Name
+				return folders[i].Name < folders[j].Name
 			}
-			return u.Folders[i].Name > u.Folders[j].Name
+			return folders[i].Name > folders[j].Name
 		})
 	case "--sort-created":
-		sort.Slice(u.Folders, func(i, j int) bool {
+		sort.Slice(folders, func(i, j int) bool {
 			if isAsc {
-				return u.Folders[i].CreatedAt < u.Folders[j].CreatedAt
+				return folders[i].CreatedAt < folders[j].CreatedAt
 			}
-			return u.Folders[i].CreatedAt > u.Folders[j].CreatedAt
+			return folders[i].CreatedAt > folders[j].CreatedAt
 		})
 	default:
 		return nil, fmt.Errorf(CommandsUsage["list-folders"])
 	}
 
-	return u.Folders, nil
+	return folders, nil
 }
 
 func (u *User) RenameFolder(folderName string, newFolderName string) error {
-	for _, folder := range u.Folders {
-		if folder.Name == folderName {
-			folder.Name = newFolderName
-		}
+	folder, exists := u.Folders[folderName]
+	if !exists {
+		return fmt.Errorf("the %s doesn't exist", folderName)
 	}
 
-	return fmt.Errorf("Error: The %s doesn't exist.", folderName)
+	if _, exists := u.Folders[newFolderName]; exists {
+		return fmt.Errorf("the %s already exists", newFolderName)
+	}
+
+	folder.Name = newFolderName
+	u.Folders[newFolderName] = folder
+	delete(u.Folders, folderName)
+
+	return nil
 }
 
 func (u *User) GetFolder(folderName string) (*Folder, error) {
-	for _, folder := range u.Folders {
-		if folder.Name == folderName {
-			return folder, nil
-		}
+	folder, exists := u.Folders[folderName]
+	if !exists {
+		return nil, fmt.Errorf("the %s doesn't exist", folderName)
 	}
-	return nil, fmt.Errorf("Error: The %s doesn't exist.", folderName)
-}
-
-func (u *User) checkFolder(folderName string) bool {
-	for _, folder := range u.Folders {
-		if folder.Name == folderName {
-			return true
-		}
-	}
-
-	return false
+	return folder, nil
 }
 
 func RegisterUser(username string) error {
-	if CheckUser(username) {
-		return fmt.Errorf("Error: The %s has already existed.", username)
+	if _, exists := ListUser[username]; exists {
+		return fmt.Errorf("the %s has already existed", username)
 	}
 
 	if !utils.ValidateString(username) {
-		return fmt.Errorf("Error: The %s contain invalid chars.", username)
+		return fmt.Errorf("the %s contain invalid chars", username)
 	}
 
 	newUser := &User{
 		Username: username,
-		Folders:  make([]*Folder, 0),
+		Folders:  make(map[string]*Folder),
 	}
 
-	ListUser = append(ListUser, newUser)
+	ListUser[username] = newUser
 
 	return nil
 }
 
 func GetUser(username string) (*User, error) {
-	for _, user := range ListUser {
-		if user.Username == username {
-			return user, nil
-		}
+	if user, exists := ListUser[username]; exists {
+		return user, nil
 	}
 
-	return nil, fmt.Errorf("Error: The %s doesn't exist.", username)
-}
-
-func CheckUser(username string) bool {
-	for _, user := range ListUser {
-		if user.Username == username {
-			return true
-		}
-	}
-
-	return false
+	return nil, fmt.Errorf("the %s doesn't exist", username)
 }

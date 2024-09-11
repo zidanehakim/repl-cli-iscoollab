@@ -11,7 +11,7 @@ type Folder struct {
 	Name        string
 	Description string
 	CreatedAt   string
-	Files       []*File
+	Files       map[string]*File
 }
 
 type File struct {
@@ -22,11 +22,11 @@ type File struct {
 
 func (f *Folder) CreateFile(fileName string, description string) error {
 	if !utils.ValidateString(fileName) {
-		return fmt.Errorf("Error: %s contain invalid chars.", fileName)
+		return fmt.Errorf("%s contain invalid chars", fileName)
 	}
 
-	if f.CheckFile(fileName) {
-		return fmt.Errorf("Error: The %s has already existed.", fileName)
+	if _, exists := f.Files[fileName]; exists {
+		return fmt.Errorf("the %s has already existed", fileName)
 	}
 
 	file := &File{
@@ -35,29 +35,18 @@ func (f *Folder) CreateFile(fileName string, description string) error {
 		CreatedAt:   time.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	f.Files = append(f.Files, file)
+	f.Files[fileName] = file
 
 	return nil
 }
 
 func (f *Folder) DeleteFile(fileName string) error {
-	for i, file := range f.Files {
-		if file.Name == fileName {
-			f.Files = append(f.Files[:i], f.Files[i+1:]...)
-			return nil
-		}
+	if _, exists := f.Files[fileName]; exists {
+		delete(f.Files, fileName)
+		return nil
 	}
 
-	return fmt.Errorf("Error: The %s doesn't exist.", fileName)
-}
-
-func (f *Folder) CheckFile(fileName string) bool {
-	for _, file := range f.Files {
-		if file.Name == fileName {
-			return true
-		}
-	}
-	return false
+	return fmt.Errorf("the %s doesn't exist", fileName)
 }
 
 func (f *Folder) ListFiles(sortBy string, sortOrder string) ([]*File, error) {
@@ -71,24 +60,29 @@ func (f *Folder) ListFiles(sortBy string, sortOrder string) ([]*File, error) {
 		return nil, fmt.Errorf(CommandsUsage["list-files"])
 	}
 
+	files := make([]*File, 0, len(f.Files))
+	for _, file := range f.Files {
+		files = append(files, file)
+	}
+
 	switch sortBy {
 	case "--sort-name":
-		sort.Slice(f.Files, func(i, j int) bool {
+		sort.Slice(files, func(i, j int) bool {
 			if isAsc {
-				return f.Files[i].Name < f.Files[j].Name
+				return files[i].Name < files[j].Name
 			}
-			return f.Files[i].Name > f.Files[j].Name
+			return files[i].Name > files[j].Name
 		})
 	case "--sort-created":
-		sort.Slice(f.Files, func(i, j int) bool {
+		sort.Slice(files, func(i, j int) bool {
 			if isAsc {
-				return f.Files[i].CreatedAt < f.Files[j].CreatedAt
+				return files[i].CreatedAt < files[j].CreatedAt
 			}
-			return f.Files[i].CreatedAt > f.Files[j].CreatedAt
+			return files[i].CreatedAt > files[j].CreatedAt
 		})
 	default:
 		return nil, fmt.Errorf(CommandsUsage["list-files"])
 	}
 
-	return f.Files, nil
+	return files, nil
 }
