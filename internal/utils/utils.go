@@ -21,10 +21,16 @@ func ParseInput(input string) []string {
 		match[0] = strings.TrimSpace(match[0])
 		if len(match) > 1 {
 			match[1] = strings.TrimSpace(match[1])
+
 		}
 
 		if match[0][0] == '\'' || match[0][0] == '"' {
-			args = append(args, `"`+match[1]+`"`)
+			// Check if the string contains spaces, if not then quotes isnt needed
+			if !strings.Contains(match[1], " ") {
+				args = append(args, match[1])
+			} else {
+				args = append(args, `"`+match[1]+`"`)
+			}
 		} else {
 			args = append(args, match[0])
 		}

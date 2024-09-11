@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"repl-cli-iscoollab/internal/user"
+	"strings"
 )
 
 func Register(args []string) error {
@@ -12,7 +13,7 @@ func Register(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["register"])
 	}
 
-	username := args[0]
+	username := strings.ToLower(args[0])
 	err := user.RegisterUser(username)
 	if err != nil {
 		return err
@@ -28,8 +29,8 @@ func CreateFolder(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["create-folder"])
 	}
 
-	username := args[0]
-	folderName := args[1]
+	username := strings.ToLower(args[0])
+	folderName := strings.ToLower(args[1])
 	var description string
 	if len(args) > 2 {
 		description = args[2]
@@ -56,8 +57,8 @@ func DeleteFolder(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["delete-folder"])
 	}
 
-	username := args[0]
-	folderName := args[1]
+	username := strings.ToLower(args[0])
+	folderName := strings.ToLower(args[1])
 
 	user, err := user.GetUser(username)
 	if err != nil {
@@ -79,7 +80,7 @@ func ListFolders(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["list-folders"])
 	}
 
-	username := args[0]
+	username := strings.ToLower(args[0])
 	sortBy := "--sort-name"
 	sortOrder := "asc"
 	if len(args) > 1 {
@@ -123,8 +124,8 @@ func RenameFolder(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["rename-folder"])
 	}
 
-	username := args[0]
-	folderName := args[1]
+	username := strings.ToLower(args[0])
+	folderName := strings.ToLower(args[1])
 	newFolderName := args[2]
 
 	user, err := user.GetUser(username)
@@ -147,9 +148,9 @@ func CreateFile(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["create-file"])
 	}
 
-	username := args[0]
-	folderName := args[1]
-	fileName := args[2]
+	username := strings.ToLower(args[0])
+	folderName := strings.ToLower(args[1])
+	fileName := strings.ToLower(args[2])
 	var description string
 	if len(args) > 3 {
 		description = args[3]
@@ -180,8 +181,8 @@ func ListFiles(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["list-files"])
 	}
 
-	username := args[0]
-	folderName := args[1]
+	username := strings.ToLower(args[0])
+	folderName := strings.ToLower(args[1])
 	sortBy := "--sort-name"
 	sortOrder := "asc"
 	if len(args) > 2 {
@@ -230,9 +231,9 @@ func DeleteFile(args []string) error {
 		return fmt.Errorf(user.CommandsUsage["delete-file"])
 	}
 
-	username := args[0]
-	folderName := args[1]
-	fileName := args[2]
+	username := strings.ToLower(args[0])
+	folderName := strings.ToLower(args[1])
+	fileName := strings.ToLower(args[2])
 
 	user, err := user.GetUser(username)
 	if err != nil {
@@ -255,7 +256,19 @@ func DeleteFile(args []string) error {
 }
 
 func Help() {
-	fmt.Println("Help")
+	fmt.Println("Available commands:")
+	fmt.Println("  register [username]                                                         - Register a new user")
+	fmt.Println("  create-folder [username] [foldername] [description]?                        - Create a new folder")
+	fmt.Println("  list-folders [username] [--sort-name|--sort-created] [asc|desc]             - List folders for a user")
+	fmt.Println("  delete-folder [username] [foldername]                                       - Delete a folder")
+	fmt.Println("  rename-folder [username] [foldername] [new-folder-name]                     - Rename a folder")
+	fmt.Println("  create-file [username] [foldername] [filename] [description]?               - Create a new file")
+	fmt.Println("  list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]  - List files in a folder")
+	fmt.Println("  delete-file [username] [foldername] [filename]                              - Delete a file")
+	fmt.Println("  help                                                                        - Show this help message")
+	fmt.Println("  exit                                                                        - Exit the program")
+	fmt.Println("\nNote: Parameters in square brackets [] are required, those with ? are optional.")
+	fmt.Println("For sorting, you can use either --sort-name or --sort-created, followed by asc (ascending) or desc (descending).")
 }
 
 func Exit() {

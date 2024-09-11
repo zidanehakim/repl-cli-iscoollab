@@ -37,7 +37,7 @@ type User struct {
 
 func (u *User) CreateFolder(folderName string, description string) error {
 	if !utils.ValidateString(folderName) {
-		return fmt.Errorf("%s contain invalid chars", folderName)
+		return fmt.Errorf("the %s contain invalid chars", folderName)
 	}
 
 	if _, exists := u.Folders[folderName]; exists {
@@ -45,7 +45,7 @@ func (u *User) CreateFolder(folderName string, description string) error {
 	}
 
 	if len(folderName) > MaxFolderNameLength {
-		return fmt.Errorf("foldername %s is too long, max length allowed is %d", folderName, MaxFolderNameLength)
+		return fmt.Errorf("foldername is too long, max length allowed is %d", MaxFolderNameLength)
 	}
 
 	folder := &Folder{
@@ -142,7 +142,7 @@ func RegisterUser(username string) error {
 	}
 
 	if len(username) > MaxUsernameLength {
-		return fmt.Errorf("the %s is too long, max length allowed is %d", username, MaxUsernameLength)
+		return fmt.Errorf("username is too long, max length allowed is %d", MaxUsernameLength)
 	}
 
 	newUser := &User{

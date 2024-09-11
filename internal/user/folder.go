@@ -22,7 +22,7 @@ type File struct {
 
 func (f *Folder) CreateFile(fileName string, description string) error {
 	if !utils.ValidateString(fileName) {
-		return fmt.Errorf("%s contain invalid chars", fileName)
+		return fmt.Errorf("the %s contain invalid chars", fileName)
 	}
 
 	if _, exists := f.Files[fileName]; exists {
@@ -30,7 +30,7 @@ func (f *Folder) CreateFile(fileName string, description string) error {
 	}
 
 	if len(fileName) > MaxFileNameLength {
-		return fmt.Errorf("filename %s is too long, max length allowed is %d", fileName, MaxFileNameLength)
+		return fmt.Errorf("filename is too long, max length allowed is %d", MaxFileNameLength)
 	}
 
 	file := &File{
