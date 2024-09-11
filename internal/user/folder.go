@@ -29,6 +29,10 @@ func (f *Folder) CreateFile(fileName string, description string) error {
 		return fmt.Errorf("the %s has already existed", fileName)
 	}
 
+	if len(fileName) > MaxFileNameLength {
+		return fmt.Errorf("filename %s is too long, max length allowed is %d", fileName, MaxFileNameLength)
+	}
+
 	file := &File{
 		Name:        fileName,
 		Description: description,

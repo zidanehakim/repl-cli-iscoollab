@@ -44,6 +44,10 @@ func (u *User) CreateFolder(folderName string, description string) error {
 		return fmt.Errorf("the %s has already existed", folderName)
 	}
 
+	if len(folderName) > MaxFolderNameLength {
+		return fmt.Errorf("foldername %s is too long, max length allowed is %d", folderName, MaxFolderNameLength)
+	}
+
 	folder := &Folder{
 		Name:        folderName,
 		CreatedAt:   time.Now().Format("2006-01-02 15:04:05"),
@@ -135,6 +139,10 @@ func RegisterUser(username string) error {
 
 	if !utils.ValidateString(username) {
 		return fmt.Errorf("the %s contain invalid chars", username)
+	}
+
+	if len(username) > MaxUsernameLength {
+		return fmt.Errorf("the %s is too long, max length allowed is %d", username, MaxUsernameLength)
 	}
 
 	newUser := &User{
