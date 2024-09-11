@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+// Test_Integration tests the integration of various commands
+// using the example usage provided in the assignment PDF.
+// This is not an exhaustive test but demonstrates the basic
+// functionality and interaction between different commands.
 func Test_Integration(t *testing.T) {
 	tests := []struct {
 		name     string
