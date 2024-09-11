@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+// Test_Register tests the Register function with various input scenarios.
+// Testing strategy:
+// 1. Test valid registrations (normal, with space, with uppercase)
+// 2. Test invalid registrations (too many args, empty username, invalid characters, too long)
+// 3. Test registering an existing user
 func Test_Register(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -45,6 +50,11 @@ func Test_Register(t *testing.T) {
 	}
 }
 
+// Test_CreateFolder tests the CreateFolder function with various input scenarios.
+// Testing strategy:
+// 1. Test valid folder creation (normal, with space in description)
+// 2. Test invalid folder creation (too few/many args, empty folder name, invalid characters)
+// 3. Test creating an existing folder
 func Test_CreateFolder(t *testing.T) {
 	// Register a test user first
 	Register([]string{"testuser"})
@@ -85,6 +95,12 @@ func Test_CreateFolder(t *testing.T) {
 	}
 }
 
+// Test_ListFolders tests the ListFolders function with various input scenarios.
+// Testing strategy:
+// 1. Test listing folders without sorting
+// 2. Test listing folders with different sorting options (name/created, asc/desc)
+// 3. Test invalid cases (too few/many args, invalid sort option)
+// 4. Test listing folders for a nonexistent user
 func Test_ListFolders(t *testing.T) {
 	// Register a test user and create folders first
 	Register([]string{"testuser"})
@@ -173,6 +189,11 @@ func Test_ListFolders(t *testing.T) {
 	}
 }
 
+// Test_DeleteFolder tests the DeleteFolder function with various input scenarios.
+// Testing strategy:
+// 1. Test valid folder deletion (normal, with space in folder name)
+// 2. Test invalid folder deletion (too few/many args)
+// 3. Test deleting a nonexistent folder
 func Test_DeleteFolder(t *testing.T) {
 	// Register a test user and create a folder first
 	Register([]string{"testuser"})
@@ -212,6 +233,11 @@ func Test_DeleteFolder(t *testing.T) {
 	}
 }
 
+// Test_RenameFolder tests the RenameFolder function with various input scenarios.
+// Testing strategy:
+// 1. Test valid folder renaming
+// 2. Test invalid folder renaming (too few/many args, empty old/new folder names, invalid characters, too long name)
+// 3. Test renaming a nonexistent folder
 func Test_RenameFolder(t *testing.T) {
 	// Register a test user and create a folder first
 	Register([]string{"testuser"})
@@ -253,6 +279,11 @@ func Test_RenameFolder(t *testing.T) {
 	}
 }
 
+// Test_CreateFile tests the CreateFile function with various input scenarios.
+// Testing strategy:
+// 1. Test valid file creation
+// 2. Test invalid file creation (too few/many args, empty file name, invalid characters, too long name)
+// 3. Test creating a file in a nonexistent folder
 func Test_CreateFile(t *testing.T) {
 	// Register a test user and create a folder first
 	Register([]string{"testuser"})
@@ -293,6 +324,11 @@ func Test_CreateFile(t *testing.T) {
 	}
 }
 
+// Test_ListFiles tests the ListFiles function with various input scenarios.
+// Testing strategy:
+// 1. Test valid file listing (normal, with sorting options)
+// 2. Test invalid file listing (too few/many args, invalid sort option)
+// 3. Test listing files in a nonexistent folder
 func Test_ListFiles(t *testing.T) {
 	// Register a test user and create a folder with files first
 	Register([]string{"testuser"})
@@ -335,6 +371,11 @@ func Test_ListFiles(t *testing.T) {
 	}
 }
 
+// Test_DeleteFile tests the DeleteFile function with various input scenarios.
+// Testing strategy:
+// 1. Test valid file deletion (normal, with space in file name)
+// 2. Test invalid file deletion (too few/many args)
+// 3. Test deleting a nonexistent file
 func Test_DeleteFile(t *testing.T) {
 	Register([]string{"testuser"})
 	CreateFolder([]string{"testuser", "testfolder", "description"})
@@ -370,6 +411,9 @@ func Test_DeleteFile(t *testing.T) {
 	}
 }
 
+// Test_Help tests the Help function.
+// Testing strategy:
+// 1. Ensure the Help function runs without errors
 func Test_Help(t *testing.T) {
 	Help()
 }
