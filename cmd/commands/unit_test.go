@@ -22,10 +22,14 @@ func Test_Register(t *testing.T) {
 		{"Username with spaces", []string{"test user"}, "", fmt.Errorf("the test user contain invalid chars")},
 		{"Username with special characters", []string{"test@user"}, "", fmt.Errorf("the test@user contain invalid chars")},
 		{"Username too long", []string{"averylongusernamethatexceedsthemaximumlength"}, "", fmt.Errorf("username is too long, max length allowed is 25")},
+		{"Nonexistent user", []string{"nonexistentuser"}, "", fmt.Errorf("the nonexistentuser has already existed")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "Nonexistent user" {
+				Register([]string{"nonexistentuser"})
+			}
 			output, err := Register(tt.args)
 			if (err != nil) != (tt.expectedError != nil) {
 				t.Errorf("Register() error = %v, expectedError %v", err, tt.expectedError)
@@ -58,10 +62,14 @@ func Test_CreateFolder(t *testing.T) {
 		{"Empty folder name", []string{"testuser", "", "description"}, "", fmt.Errorf("the  contain invalid chars")},
 		{"Folder name with spaces", []string{"testuser", "test folder", "description"}, "", fmt.Errorf("the test folder contain invalid chars")},
 		{"Folder name with special characters", []string{"testuser", "test@folder", "description"}, "", fmt.Errorf("the test@folder contain invalid chars")},
+		{"Nonexistent folder", []string{"testuser", "nonexistentfolder", "description"}, "", fmt.Errorf("the nonexistentfolder has already existed")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "Nonexistent folder" {
+				CreateFolder([]string{"testuser", "nonexistentfolder", "description"})
+			}
 			output, err := CreateFolder(tt.args)
 			if (err != nil) != (tt.expectedError != nil) {
 				t.Errorf("CreateFolder() error = %v, expectedError %v", err, tt.expectedError)
@@ -84,6 +92,7 @@ func Test_ListFolders(t *testing.T) {
 	CreateFolder([]string{"testuser", "folder2", "description2"})
 	DeleteFolder([]string{"testuser", "testfolder"})
 	DeleteFolder([]string{"testuser", "\"test folder\""})
+	DeleteFolder([]string{"testuser", "nonexistentfolder"})
 
 	tests := []struct {
 		name           string
@@ -139,6 +148,12 @@ func Test_ListFolders(t *testing.T) {
 			"",
 			fmt.Errorf(user.CommandsUsage["list-folders"]),
 		},
+		{
+			"Nonexistent user",
+			[]string{"nonexistentusers"},
+			"",
+			fmt.Errorf("the nonexistentusers doesn't exist"),
+		},
 	}
 
 	for _, tt := range tests {
@@ -174,10 +189,14 @@ func Test_DeleteFolder(t *testing.T) {
 		{"Valid delete folder with space", []string{"testuser", `"test folder"`}, "Delete \"test folder\" successfully\n", nil},
 		{"Invalid args count (too few)", []string{"testuser"}, "", fmt.Errorf(user.CommandsUsage["delete-folder"])},
 		{"Invalid args count (too many)", []string{"testuser", "testfolder", "extra"}, "", fmt.Errorf(user.CommandsUsage["delete-folder"])},
+		{"Nonexistent folder", []string{"testuser", "nonexistentfolder"}, "", fmt.Errorf("the nonexistentfolder doesn't exist")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "Nonexistent folder" {
+				DeleteFolder([]string{"testuser", "nonexistentfolder"})
+			}
 			output, err := DeleteFolder(tt.args)
 			if (err != nil) != (tt.expectedError != nil) {
 				t.Errorf("DeleteFolder() error = %v, expectedError %v", err, tt.expectedError)
@@ -211,10 +230,14 @@ func Test_RenameFolder(t *testing.T) {
 		{"Empty new folder name", []string{"testuser", "oldfolder", ""}, "", fmt.Errorf("the oldfolder doesn't exist")},
 		{"New folder name with invalid characters", []string{"testuser", "oldfolder", "new@folder"}, "", fmt.Errorf("the oldfolder doesn't exist")},
 		{"New folder name too long", []string{"testuser", "oldfolder", string(make([]byte, 256))}, "", fmt.Errorf("the oldfolder doesn't exist")},
+		{"Nonexistent folder", []string{"testuser", "nonexistentfolder", "newfolder"}, "", fmt.Errorf("the nonexistentfolder doesn't exist")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "Nonexistent folder" {
+				DeleteFolder([]string{"testuser", "nonexistentfolder"})
+			}
 			output, err := RenameFolder(tt.args)
 			if (err != nil) != (tt.expectedError != nil) {
 				t.Errorf("RenameFolder() error = %v, expectedError %v", err, tt.expectedError)
@@ -247,10 +270,14 @@ func Test_CreateFile(t *testing.T) {
 		{"Empty file name", []string{"testuser", "testfolder", "", "description"}, "", fmt.Errorf("the  contain invalid chars")},
 		{"File name with invalid characters", []string{"testuser", "testfolder", "test@file", "description"}, "", fmt.Errorf("the test@file contain invalid chars")},
 		{"File name too long", []string{"testuser", "testfolder", string(make([]byte, 256)), "description"}, "", fmt.Errorf("the %s contain invalid chars", string(make([]byte, 256)))},
+		{"Nonexistent folder", []string{"testuser", "nonexistentfolder", "testfile", "description"}, "", fmt.Errorf("the nonexistentfolder doesn't exist")},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "Nonexistent folder" {
+				DeleteFolder([]string{"testuser", "nonexistentfolder"})
+			}
 			output, err := CreateFile(tt.args)
 			if (err != nil) != (tt.expectedError != nil) {
 				t.Errorf("CreateFile() error = %v, expectedError %v", err, tt.expectedError)
